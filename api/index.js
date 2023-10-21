@@ -1,15 +1,10 @@
 const express = require('express')
-const bodyparser = require('body-parser')
+const router = require('./router/index.js')
 
 const app = express()
-
-app.use(bodyparser.json())
-
 const port = 3000
 
-app.get('/teste', (req, res) => {
-  res.status(200).send({ mensagem: 'Bem vindo a API' })
-})
+router(app)
 
 app.listen(port, () => {
   return console.log(`listening on porta ${port} http://localhost:${port}`)

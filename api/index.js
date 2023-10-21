@@ -13,7 +13,7 @@ app.get('/teste', (req, res) => {
 })
 
 app.listen(port, () => {
-    return console.log(`listening on port ${port} http://localhost:${port}`)
+    return console.log(`listening on porta ${port} http://localhost:${port}`)
 })
 
 module.exports = app

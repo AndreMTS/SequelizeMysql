@@ -25,6 +25,6 @@ module.exports = {
     'rules': {
         quotes: ['error', 'single'],
         indent: ['error', 4],
-        'comma-spacing': ['error', {before: false, after: true}]
+        'comma-spacing': ['error', { before: false, after: true }]
     }
 }

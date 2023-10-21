@@ -3,26 +3,26 @@ module.exports = {
     browser: true,
     commonjs: true,
     es2021: true,
-    node: true,
+    node: true
   },
   extends: 'eslint:recommended',
   overrides: [
     {
       env: {
-        node: true,
+        node: true
       },
       files: ['.eslintrc.{js,cjs}'],
       parserOptions: {
-        sourceType: 'script',
-      },
-    },
+        sourceType: 'script'
+      }
+    }
   ],
   parserOptions: {
-    ecmaVersion: 'latest',
+    ecmaVersion: 'latest'
   },
   rules: {
     quotes: ['error', 'single'],
     indent: ['error', 2],
-    'comma-spacing': ['error', { before: false, after: true }],
-  },
+    'comma-spacing': ['error', { before: false, after: true }]
+  }
 }

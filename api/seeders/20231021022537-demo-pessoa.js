@@ -7,37 +7,53 @@ module.exports = {
       'Pessoas',
       [
         {
-          nome: 'Andre Matos',
+          nome: 'Ana Souza',
           ativo: true,
-          email: 'andre.matos@gmail.com',
+          email: 'ana@ana.com',
           role: 'estudante',
           createdAt: new Date(),
-          updatedAt: new Date(),
+          updatedAt: new Date()
         },
         {
-          nome: 'Andre silva',
+          nome: 'Marcos Cintra',
           ativo: true,
-          email: 'andre.silva@gmail.com',
-          role: 'manager',
+          email: 'marcos@marcos.com',
+          role: 'estudante',
           createdAt: new Date(),
-          updatedAt: new Date(),
+          updatedAt: new Date()
         },
         {
-          nome: 'Andre trindade',
+          nome: 'Felipe Cardoso',
           ativo: true,
-          email: 'andre.trindade@gmail.com',
-          role: 'Faxineiro',
+          email: 'felipe@felipe.com',
+          role: 'estudante',
           createdAt: new Date(),
-          updatedAt: new Date(),
+          updatedAt: new Date()
         },
         {
-          nome: 'Andre matias',
-          ativo: true,
-          email: 'andre.matias@gmail.com',
-          role: 'Diretor',
+          nome: 'Sandra Gomes',
+          ativo: false,
+          email: 'sandra@sandra.com',
+          role: 'estudante',
           createdAt: new Date(),
-          updatedAt: new Date(),
+          updatedAt: new Date()
         },
+        {
+          nome: 'Paula Morais',
+          ativo: true,
+          email: 'paula@paula.com',
+          role: 'docente',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          nome: 'Sergio Lopes',
+          ativo: true,
+          email: 'sergio@sergio.com',
+          role: 'docente',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
       ],
       {}
     )
@@ -45,5 +61,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('Pessoas', null, {})
-  },
+  }
 }

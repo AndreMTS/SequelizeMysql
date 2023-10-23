@@ -1,9 +1,23 @@
-'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Pessoas = sequelize.define('Pessoas', {
-    nome: DataTypes.STRING,
+    nome: {
+      type: DataTypes.STRING,
+      validate: {
+        validarNome: (nome) => {
+          if (nome.length < 3) throw new Error('Nome deve ter mais que 3 caracteres!')
+        }
+      }
+    },
     ativo: DataTypes.BOOLEAN,
-    email: DataTypes.STRING,
+    email: {
+      type: DataTypes.STRING,
+      validate: {
+        isEmail: {
+          args: true,
+          msg: 'Email invalido'
+        }
+      }
+    },
     role: DataTypes.STRING
   }, 
   { 
@@ -20,7 +34,9 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'docente_id'
     }) 
     Pessoas.hasMany(models.Matriculas, {
-      foreignKey: 'estudante_id'
+      foreignKey: 'estudante_id',
+      scope: { status: 'confirmado' },
+      as: 'aulasMatriculadas'
     })
 
   };

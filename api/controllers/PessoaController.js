@@ -1,15 +1,19 @@
-const database = require('../models')
-const Sequelize = require('sequelize')
+// const database = require('../models')
+// const Sequelize = require('sequelize')
+const Services = require('../services/Services.js')
+
+const pessoasServices = new Services('Pessoas')
 
 class PessoaController {
   static async buscarPessoasAtivas(req, res) {
     try {
-      const pessoasAtivas = await database.Pessoas.findAll()
+      const pessoasAtivas = await pessoasServices.pegaTodosOsRegistros()
       return res.status(200).json(pessoasAtivas)
     } catch (error) {
       return res.status(500).json(error.message)
     }
   }
+
   static async buscarTodasPessoas(req, res) {
     try {
       const todasPessoas = await database.Pessoas.scope('todos').findAll()
@@ -88,7 +92,6 @@ class PessoaController {
       await database.Pessoas.restore({ where: { id: Number(id) } })
 
       return res.status(200).json({ message: `id ${id} restaurado` })
-    
     } catch (error) {
       return res.status(500).json({ message: error.message })
     }
@@ -129,18 +132,24 @@ class PessoaController {
     const { estudanteId, matriculaId } = req.params
     const novasInfos = req.body
     try {
-      await database.Matriculas.update(novasInfos, { where: { id: Number(matriculaId), estudante_id: Number(estudanteId) } })
-      const MatriculasAtualizada = await database.Matriculas.findOne({where: { id: Number(matriculaId) } })
+      await database.Matriculas.update(novasInfos, {
+        where: { id: Number(matriculaId), estudante_id: Number(estudanteId) }
+      })
+      const MatriculasAtualizada = await database.Matriculas.findOne({
+        where: { id: Number(matriculaId) }
+      })
       return res.status(200).json(MatriculasAtualizada)
-    }
-    catch (error) { 
-      return res.status(500).json({ message: error.message }) 
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
     }
   }
 
   static async deletarMatricula(req, res) {
     const { estudanteId, matriculaId } = req.params
-    try { await database.Matriculas.destroy({ where: { id: Number(matriculaId), estudante_id: Number(estudanteId) } })
+    try {
+      await database.Matriculas.destroy({
+        where: { id: Number(matriculaId), estudante_id: Number(estudanteId) }
+      })
       return res.status(200).json({ message: `${matriculaId} foi deletado` })
     } catch (error) {
       return res.status(500).json({ message: error.message })
@@ -156,62 +165,84 @@ class PessoaController {
           estudante_id: Number(estudanteId)
         }
       })
-      return res.status(200).json({ mensagem: `id ${matriculaId} restaurado`})
+      return res.status(200).json({ mensagem: `id ${matriculaId} restaurado` })
     } catch (error) {
       return res.status(500).json(error.message)
     }
   }
 
-  static async pegaMatriculas( req, res) {
+  static async pegaMatriculas(req, res) {
     const { estudanteId } = req.params
     try {
-      const pessoa = await database.Pessoas.findOne({ where: {id:(estudanteId) } } )
+      const pessoa = await database.Pessoas.findOne({
+        where: { id: estudanteId }
+      })
       const matriculas = await pessoa.getAulasMatriculadas()
-      return res. status(200).json(matriculas)
+      return res.status(200).json(matriculas)
+    } catch (error) {
+      return res.status(500).json(error.message)
     }
-    catch (error){
-      return res.status(500).json(error.message)}
   }
 
-  static async pegaMatriculasPorTurma( req, res) {
+  static async pegaMatriculasPorTurma(req, res) {
     const { turmaId } = req.params
     try {
-      const todasAsMatriculas = await database.Matriculas
-        .findAndCountAll({ 
-          where: {
-            turma_id:( Number(turmaId) ),
-            status: 'confirmado'
-          },
-          limit: 20,
-          order: [['estudante_id', 'asc']]
-        })
+      const todasAsMatriculas = await database.Matriculas.findAndCountAll({
+        where: {
+          turma_id: Number(turmaId),
+          status: 'confirmado'
+        },
+        limit: 20,
+        order: [['estudante_id', 'asc']]
+      })
 
-      return res. status(200).json(todasAsMatriculas)
+      return res.status(200).json(todasAsMatriculas)
+    } catch (error) {
+      return res.status(500).json(error.message)
     }
-    catch (error){
-      return res.status(500).json(error.message)}
   }
 
-  static async pegaTurmasLotadas( req, res) {
+  static async pegaTurmasLotadas(req, res) {
     const turmaLotada = 2
     try {
-      const turmaLotadas = await database.Matriculas
-        .findAndCountAll({ 
-          where: {
-            status: 'confirmado',
-          },
-          attributes: ['turma_id'],
-          group: ['turma_id'],
-          having: Sequelize.literal(`count(turma_id) >= ${turmaLotada} `)
-        })
+      const turmaLotadas = await database.Matriculas.findAndCountAll({
+        where: {
+          status: 'confirmado'
+        },
+        attributes: ['turma_id'],
+        group: ['turma_id'],
+        having: Sequelize.literal(`count(turma_id) >= ${turmaLotada} `)
+      })
 
-      return res. status(200).json(turmaLotadas.count)
+      return res.status(200).json(turmaLotadas.count)
+    } catch (error) {
+      return res.status(500).json(error.message)
     }
-    catch (error){
-      return res.status(500).json(error.message)}
+  }
+
+  static async cancelaPessoa(req, res) {
+    const { estudanteId } = req.params
+    try {
+      database.sequelize.transaction(async (transacao) => {
+        await database.Pessoas.update(
+          { ativo: false },
+          { where: { id: Number(estudanteId) } },
+          { transaction: transacao }
+        )
+
+        await database.Matriculas.update(
+          { status: 'cancelado' },
+          { where: { id: Number(estudanteId) } },
+          { transaction: transacao }
+        )
+      })
+      return res
+        .status(200)
+        .json({ message: `Matriculas referente estudante ${estudanteId}` })
+    } catch (error) {
+      return res.status(500).json(error.message)
+    }
   }
 }
 
 module.exports = PessoaController
-
-

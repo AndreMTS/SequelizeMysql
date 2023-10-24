@@ -11,6 +11,7 @@ router
   .post(  '/pessoas/:id/restaura/',  PessoaController.restauraPessoa)
   .put('/pessoas/:id', PessoaController.atualizaPessoa)
   .delete('/pessoas/:id', PessoaController.deletarPessoa)
+  .post('/pessoas/:estudanteId/cancela', PessoaController.cancelaPessoa)
 
 //Matriculas rotas
 router
